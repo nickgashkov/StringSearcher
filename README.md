@@ -1,2 +1,2 @@
 # SubstringSearchEfficiency
-This project is designed to compare the performance of fourteen "substring searcher"–algorithms.
+This project is designed to compare the performance of the most common "substring searcher"–algorithms.

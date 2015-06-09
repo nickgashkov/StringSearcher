@@ -1,8 +1,11 @@
+import time
+
 ####################
 # Primitive Search #
 #####################
 
 def Primitive(haystack, needle):
+    t = time.perf_counter()
     index = -1
     for i in range(len(haystack)-len(needle)+1):
         success = True
@@ -11,7 +14,7 @@ def Primitive(haystack, needle):
                 success = False
                 break
         if success:
-            print('Pattern «' + needle + '» found at position',i)
+            print('Pattern «' + needle + '» found at position',i,'%f'%(time.perf_counter() - t))
             break
 
 ######################
@@ -46,6 +49,7 @@ def generateSuffixShift(key):
     return skipList
     
 def BoyerMoore(haystack, needle):
+    t = time.perf_counter()
     goodSuffix = generateSuffixShift(needle)
     badChar = generateBadCharShift(needle)
     i = 0
@@ -61,7 +65,7 @@ def BoyerMoore(haystack, needle):
             else:
                 i += goodSuffixShift
         else:
-            print('Pattern «' + needle + '» found at position',i)
+            print('Pattern «' + needle + '» found at position',i,'%f'%(time.perf_counter() - t))
             break
 
 ###############################
@@ -69,6 +73,7 @@ def BoyerMoore(haystack, needle):
 ###############################
 
 def BoyerMooreHorspool(haystack, needle):
+    t = time.perf_counter()
     n = len(haystack)
     m = len(needle)
     skip = []
@@ -80,7 +85,7 @@ def BoyerMooreHorspool(haystack, needle):
         j = m - 1; i = k
         while j >= 0 and haystack[i] == needle[j]:
             j -= 1; i -= 1
-        if j == -1: print('Pattern «' + needle + '» found at position',i + 1)
+        if j == -1: print('Pattern «' + needle + '» found at position',i + 1,'%f'%(time.perf_counter() - t))
         k += skip[ord(haystack[k])]
 
 ##############
@@ -88,6 +93,7 @@ def BoyerMooreHorspool(haystack, needle):
 ##############
 
 def RabinKarp(haystack, needle, d, q):
+    t = time.perf_counter()
     n = len(haystack)
     m = len(needle)
     h = pow(d, m-1)%q
@@ -110,13 +116,14 @@ def RabinKarp(haystack, needle, d, q):
             t = (t-h*ord(haystack[s]))%q
             t = (t*d+ord(haystack[s+m]))%q
             t = (t+q)%q
-    print('Pattern «' + needle + '» found at position',result[0])
+    print('Pattern «' + needle + '» found at position',result[0],'%f'%(time.perf_counter() - t))
 
 ######################
 # Knuth-Morris-Pratt #
 ######################
 
 def KnuthMorrisPratt(haystack, needle):
+    t = time.perf_counter()
     if needle == "":
         return 0
 
@@ -136,5 +143,16 @@ def KnuthMorrisPratt(haystack, needle):
         if haystack[i] == needle[j]:
             j += 1
             if j == len(needle):
-                print('Pattern «' + needle + '» found at position',i - (j - 1))
+                print('Pattern «' + needle + '» found at position',i - (j - 1),'%f'%(time.perf_counter() - t))
     return None
+
+#########
+# Whole #
+#########
+
+def Whole(haystack, needle):
+    Primitive(haystack, needle)
+    BoyerMoore(haystack, needle)
+    BoyerMooreHorspool(haystack, needle)
+    RabinKarp(haystack, needle, 1, 1)
+    KnuthMorrisPratt(haystack, needle)

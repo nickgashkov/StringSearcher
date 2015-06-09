@@ -81,7 +81,7 @@ class UserInterface:
         self.kmpResultLabel["fg"] = "#004161"
         self.kmpResultLabel.grid(row = 10, column = 3, columnspan = 2, sticky = W)
 
-        self.titleLabel = Label(root, text = "STRING SEARCHER", background = '#f0f8ff')
+        self.titleLabel = Label(root, text = "StringSearcher", background = '#f0f8ff')
         self.titleLabel["fg"] = "#00527a"
         self.titleLabel.config(font='bold')
         self.titleLabel.grid(row = 1, column = 1, columnspan = 4, padx = 5, pady = 5)
@@ -115,7 +115,7 @@ class UserInterface:
         self -- object to place on frame, configure parametrs e.t.c
 
         """
-        showinfo("Editor Authors", "String Searcher ©2015")
+        showinfo("Editor Authors", "StringSearcher ©2015")
 
     def close_app(self):
         """Adds "Exit" to cascade
@@ -146,7 +146,7 @@ class UserInterface:
         self.kmpResultLabel.configure(text = kmp_search.get())
 
 root = Tk()
-root.title("String Searcher")
+root.title("StringSearcher")
 root.configure(background = "#f0f8ff")
 root.geometry('295x300') 
 root.resizable(width = FALSE, height = FALSE)

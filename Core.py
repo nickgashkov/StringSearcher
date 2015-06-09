@@ -1,10 +1,12 @@
 import time
+from tkinter import *
 
 ####################
 # Primitive Search #
 #####################
 
 def Primitive(haystack, needle):
+    PrimRes = StringVar()
     t = time.perf_counter()
     index = -1
     for i in range(len(haystack)-len(needle)+1):
@@ -14,7 +16,9 @@ def Primitive(haystack, needle):
                 success = False
                 break
         if success:
-            print('Pattern «' + needle + '» found at position',i,'%f'%(time.perf_counter() - t))
+            result = 'pos:', i,'time: %f'%(time.perf_counter() - t)
+            PrimRes.set(result)
+            return(PrimRes)
             break
 
 ######################
@@ -49,6 +53,7 @@ def generateSuffixShift(key):
     return skipList
     
 def BoyerMoore(haystack, needle):
+    BMRes = StringVar()
     t = time.perf_counter()
     goodSuffix = generateSuffixShift(needle)
     badChar = generateBadCharShift(needle)
@@ -65,7 +70,9 @@ def BoyerMoore(haystack, needle):
             else:
                 i += goodSuffixShift
         else:
-            print('Pattern «' + needle + '» found at position',i,'%f'%(time.perf_counter() - t))
+            result = 'pos:', i,'time: %f'%(time.perf_counter() - t)
+            BMRes.set(result)
+            return(BMRes)
             break
 
 ###############################
@@ -73,6 +80,7 @@ def BoyerMoore(haystack, needle):
 ###############################
 
 def BoyerMooreHorspool(haystack, needle):
+    BMHRes = StringVar()
     t = time.perf_counter()
     n = len(haystack)
     m = len(needle)
@@ -85,7 +93,10 @@ def BoyerMooreHorspool(haystack, needle):
         j = m - 1; i = k
         while j >= 0 and haystack[i] == needle[j]:
             j -= 1; i -= 1
-        if j == -1: print('Pattern «' + needle + '» found at position',i + 1,'%f'%(time.perf_counter() - t))
+        if j == -1:
+            result = 'pos:', i + 1,'time: %f'%(time.perf_counter() - t)
+            BMHRes.set(result)
+            return(BMHRes)
         k += skip[ord(haystack[k])]
 
 ##############
@@ -93,6 +104,7 @@ def BoyerMooreHorspool(haystack, needle):
 ##############
 
 def RabinKarp(haystack, needle, d, q):
+    RKRes = StringVar()
     t = time.perf_counter()
     n = len(haystack)
     m = len(needle)
@@ -116,13 +128,16 @@ def RabinKarp(haystack, needle, d, q):
             t = (t-h*ord(haystack[s]))%q
             t = (t*d+ord(haystack[s+m]))%q
             t = (t+q)%q
-    print('Pattern «' + needle + '» found at position',result[0],'%f'%(time.perf_counter() - t))
-
+    resultik = 'pos:', result[0],'time: %f'%(time.perf_counter() - t)
+    RKRes.set(resultik)
+    return(RKRes)
+        
 ######################
 # Knuth-Morris-Pratt #
 ######################
 
 def KnuthMorrisPratt(haystack, needle):
+    KMPRes = StringVar()
     t = time.perf_counter()
     if needle == "":
         return 0
@@ -143,15 +158,16 @@ def KnuthMorrisPratt(haystack, needle):
         if haystack[i] == needle[j]:
             j += 1
             if j == len(needle):
-                print('Pattern «' + needle + '» found at position',i - (j - 1),'%f'%(time.perf_counter() - t))
-    return None
+                result = 'pos:', i - (j - 1),'time: %f'%(time.perf_counter() - t)
+                KMPRes.set(result)
+                return(KMPRes)
 
 #########
 # Whole #
 #########
 
 def Whole(haystack, needle):
-    Primitive(haystack, needle)
+    PrimRes = Primitive(haystack, needle)
     BoyerMoore(haystack, needle)
     BoyerMooreHorspool(haystack, needle)
     RabinKarp(haystack, needle, 1, 1)

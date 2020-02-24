@@ -26,30 +26,21 @@ def naive(haystack, needle):
     naiveResult = StringVar()
     t = time.perf_counter()
     for i in range(len(haystack) - len(needle) + 1):
-        match = True
-        for j in range(len(needle)):
-            if needle[j] != haystack[i+j]:
-                match = False
-                break
+        match = all(needle[j] == haystack[i+j] for j in range(len(needle)))
         if match:
             result = "pos: %i"%i, "time: %f"%(time.perf_counter() - t)
             naiveResult.set(result)
             return(naiveResult)
 
 def generate_bad_char_shift(term):
-    skipList = {}
-    for i in range(0, len(term) - 1):
-        skipList[term[i]] = len(term) - i - 1
-    return skipList
+    return {term[i]: len(term) - i - 1 for i in range(len(term) - 1)}
 
 def find_suffix_position(badChar, suffix, fullTerm):
     for offset in range(1, len(fullTerm) + 1)[::-1]:
         match = True
-        for suffixIndex in range(0, len(suffix)):
+        for suffixIndex in range(len(suffix)):
             termIndex = offset - len(suffix) - 1 + suffixIndex
-            if termIndex < 0 or suffix[suffixIndex] == fullTerm[termIndex]:
-                pass
-            else:
+            if termIndex >= 0 and suffix[suffixIndex] != fullTerm[termIndex]:
                 match = False
         termIndex = offset - len(suffix) - 1
         if match and (termIndex <= 0 or fullTerm[termIndex-1] != badChar):
@@ -58,9 +49,11 @@ def find_suffix_position(badChar, suffix, fullTerm):
 def generate_suffix_shift(key):
     skipList = {}
     buffer = ""
-    for i in range(0, len(key)):
-        skipList[len(buffer)] = find_suffix_position(key[len(key)-1-i], buffer, key)
-        buffer = key[len(key)-1-i] + buffer
+    for i in range(len(key)):
+        skipList[len(buffer)] = find_suffix_position(
+            key[len(key) - 1 - i], buffer, key
+        )
+        buffer = key[len(key) - 1 - i] + buffer
     return skipList
 
 def boyer_moore(haystack, needle):
@@ -78,19 +71,20 @@ def boyer_moore(haystack, needle):
     i = 0
     while i < len(haystack) - len(needle) + 1:
         j = len(needle)
-        while j > 0 and needle[j-1] == haystack[i+j-1]:
+        while j > 0 and needle[j - 1] == haystack[i + j - 1]:
             j -= 1
         if j > 0:
-            badCharShift = badChar.get(haystack[i+j-1], len(needle))
-            goodSuffixShift = goodSuffix[len(needle)-j]
-            if badCharShift > goodSuffixShift:
-                i += badCharShift
-            else:
-                i += goodSuffixShift
+            badCharShift = badChar.get(haystack[i + j - 1], len(needle))
+            goodSuffixShift = goodSuffix[len(needle) - j]
+            i += (
+                badCharShift
+                if badCharShift > goodSuffixShift
+                else goodSuffixShift
+            )
         else:
-            result = "pos: %i"%i, "time: %f"%(time.perf_counter() - t)
+            result = "pos: %i" % i, "time: %f" % (time.perf_counter() - t)
             bmResult.set(result)
-            return(bmResult)
+            return bmResult
 
 def boyer_moore_horspool(haystack, needle):
     """Searching string using Boyer-Moore-Horspool string search algorithm
@@ -104,9 +98,7 @@ def boyer_moore_horspool(haystack, needle):
     t = time.perf_counter()
     n = len(haystack)
     m = len(needle)
-    skip = []
-    for k in range(256):
-        skip.append(m)
+    skip = [m for _ in range(256)]
     for k in range(m - 1):
         skip[ord(needle[k])] = m - k - 1
     skip = tuple(skip)
@@ -144,13 +136,9 @@ def rabin_karp(haystack, needle, d, q):
         w = (d * w + ord(haystack[i]))%q
     for s in range(n - m + 1):
         if p == w:
-            match = True
-            for i in range(m):
-                if needle[i] != haystack[s+i]:
-                    match = False
-                    break
+            match = all(needle[i] == haystack[s+i] for i in range(m))
             if match:
-                output = output + [s]
+                output += [s]
         if s < n - m:
             w = (w - h * ord(haystack[s]))%q
             w = (w * d + ord(haystack[s+m]))%q
